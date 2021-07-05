@@ -1,69 +1,38 @@
 package com.cristianbalta.cloudmanagerworker.controller;
 
+import com.cristianbalta.cloudmanagerworker.dto.PairDto;
+import com.cristianbalta.cloudmanagerworker.dto.SystemInformationDto;
+import com.cristianbalta.cloudmanagerworker.service.CloudService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @RestController
-@RequestMapping(path = "/api/kube")
+@RequestMapping(path = "/api/cloud")
 public class CloudController {
 
-//    private V1PodList list;
-//
-//    KubeController() {
-//        ApiClient client = null;
-//        try {
-//            client = Config.defaultClient();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        Configuration.setDefaultApiClient(client);
-//
-//        CoreV1Api api = new CoreV1Api();
-//        list = null;
-//        try {
-//            list = api.listNamespacedPod("default", null, null, null, null, null, null, null, null, null);
-//        } catch (ApiException e) {
-//            e.printStackTrace();
-//        }
-//        for (V1Pod item : list.getItems()) {
-//            System.out.println(Objects.requireNonNull(item.getMetadata()).getName());
-//        }
-//
-//        V1Pod pod = new V1PodBuilder()
-//                .withNewMetadata()
-//                .withName("apod")
-//                .endMetadata()
-//                .withNewSpec()
-//                .addNewContainer()
-//                .withName("www")
-//                .withImage("nginx")
-//                .endContainer()
-//                .endSpec()
-//                .build();
-//
-////        api.createNamespacedPod("default", pod, null, null, null);
-//
-//        try {
-//            list = api.listNamespacedPod("default", null, null, null, null, null, null, null, null, null);
-//        } catch (ApiException e) {
-//            e.printStackTrace();
-//        }
-//        for (V1Pod item : list.getItems()) {
-//            System.out.println(Objects.requireNonNull(item.getMetadata()).getSelfLink());
-//        }
-//    }
-//
-//    @GetMapping
-//    public List<String> getPods() {
-//        return list.getItems().stream().map(V1Pod::getMetadata).filter(Objects::nonNull).map(V1ObjectMeta::getName).collect(Collectors.toList());
-//    }
+    private final CloudService cloudService;
 
-    @GetMapping
-    public ResponseEntity<String> test() {
-        return new ResponseEntity<>("DADA", HttpStatus.OK);
+    public CloudController(CloudService cloudService) {
+        this.cloudService = cloudService;
     }
 
+    @GetMapping("/{command}")
+    public ResponseEntity<String> runCommand(@PathVariable String command) throws IOException {
+        PairDto<String, Boolean> pairDto = cloudService.runCommand(command);
+        if (!pairDto.getB()) {
+            return new ResponseEntity<>(pairDto.getA(), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(pairDto.getA(), HttpStatus.OK);
+    }
+
+    @GetMapping("/system-information")
+    public ResponseEntity<SystemInformationDto> getSystemInformation() {
+        return ResponseEntity.ok(cloudService.getSystemInformation());
+    }
 }
