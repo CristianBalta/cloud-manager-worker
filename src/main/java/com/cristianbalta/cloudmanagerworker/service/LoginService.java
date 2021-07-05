@@ -13,6 +13,11 @@ public class LoginService {
     private String password;
 
     public boolean checkIfUserExists(String userEmail, String userPassword) {
+        if (username == null || password == null){
+            username = System.getenv("USERNAME");
+            password = System.getenv("PASSWORD");
+        }
+
         return userEmail.equals(username) && userPassword.equals(password);
     }
 }

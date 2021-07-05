@@ -2,8 +2,6 @@ package com.cristianbalta.cloudmanagerworker.security.jwt;
 
 import com.cristianbalta.cloudmanagerworker.security.model.ErrorResponse;
 import com.google.gson.Gson;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,8 +22,6 @@ import java.util.List;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(JwtRequestFilter.class);
 
     public void setErrorResponse(HttpStatus status, HttpServletResponse response, HttpServletRequest request, Throwable ex) {
         response.setStatus(status.value());
@@ -49,7 +45,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         final String authorizationHeader = request.getHeader("Authorization");
-        LOGGER.info(authorizationHeader);
         String jwt;
         String username = null;
         if (!authorizationHeader.equals("") && authorizationHeader.startsWith("Bearer ")) {
